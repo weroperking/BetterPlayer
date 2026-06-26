@@ -104,6 +104,21 @@ linux_libmpv_status() {
   return 1
 }
 
+linux_display_status() {
+  if [ -n "${DISPLAY:-}" ]; then
+    printf 'present (DISPLAY=%s)' "$DISPLAY"
+    return 0
+  fi
+
+  if [ -n "${WAYLAND_DISPLAY:-}" ]; then
+    printf 'present (WAYLAND_DISPLAY=%s)' "$WAYLAND_DISPLAY"
+    return 0
+  fi
+
+  printf 'missing'
+  return 1
+}
+
 warn_about_libmpv() {
   case "$(detect_os)" in
     linux)
@@ -122,6 +137,16 @@ warn_about_libmpv() {
   esac
 }
 
+require_gui_session() {
+  case "$(detect_os)" in
+    linux)
+      if ! linux_display_status >/dev/null; then
+        fail "No Linux GUI display is available for GTK/Tauri. Start BetterPlayer from a desktop session, forward X11/Wayland into this environment, or run only checks/builds here with: npm run check"
+      fi
+      ;;
+  esac
+}
+
 setup() {
   ensure_toolchain
   install_node_deps
@@ -131,6 +156,7 @@ setup() {
 
 run_dev() {
   setup
+  require_gui_session
   log "Starting BetterPlayer via Tauri dev..."
   (cd "$ROOT_DIR" && npm run tauri -- dev)
 }
@@ -183,6 +209,7 @@ run_doctor() {
   case "$(detect_os)" in
     linux)
       printf '  libmpv: %s\n' "$(linux_libmpv_status)"
+      printf '  display: %s\n' "$(linux_display_status)"
       ;;
     windows|mingw*|msys*)
       printf '  libmpv-wrapper.dll: %s\n' "$([ -f "$TAURI_DIR/lib/libmpv-wrapper.dll" ] && echo present || echo missing)"
