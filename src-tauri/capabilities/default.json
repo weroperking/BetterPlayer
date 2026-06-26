@@ -1,0 +1,1 @@
+{"identifier":"default","description":"BetterPlayer MVP permissions","windows":["main"],"permissions":["core:default","dialog:default","dialog:allow-open","fs:default"]}

@@ -1,0 +1,27 @@
+{
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "tauri": "tauri",
+    "setup": "bash ./scripts/betterplayer.sh setup",
+    "start": "bash ./scripts/betterplayer.sh dev",
+    "check": "bash ./scripts/betterplayer.sh check",
+    "test": "bash ./scripts/betterplayer.sh test",
+    "doctor": "bash ./scripts/betterplayer.sh doctor"
+  },
+  "dependencies": {
+    "@tauri-apps/api": "latest",
+    "@tauri-apps/plugin-dialog": "latest",
+    "@tauri-apps/plugin-fs": "latest",
+    "vite": "latest",
+    "typescript": "latest",
+    "react": "latest",
+    "react-dom": "latest",
+    "framer-motion": "latest",
+    "zustand": "latest",
+    "lucide-react": "latest"
+  },
+  "devDependencies": {
+    "@tauri-apps/cli": "latest"
+  }
+}
