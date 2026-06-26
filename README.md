@@ -9,7 +9,7 @@ A free and open source media player alternative to QQPlayer with mpv capabilitie
 - React/TypeScript overlay with an empty/audio fallback state, bottom controls, predictive seek bar, session queue, and native drag/drop handling.
 - `AGENTS.md` with project guidance for future agents and contributors.
 
-> Current backend note: `src-tauri/src/mpv.rs` is the mpv integration boundary. It preserves the command/event contract, but real playback still requires wiring the controller to `tauri-plugin-libmpv` and adding the Windows libmpv DLLs.
+> Current backend note: `src-tauri/src/mpv.rs` is the mpv integration boundary. It preserves the command/event contract, but real playback still requires wiring the controller to `tauri-plugin-libmpv`. Windows runs need bundled libmpv DLLs; Linux runs use the system libmpv package.
 
 ## Prerequisites
 
@@ -19,6 +19,7 @@ Install these on your machine before running the helper script:
 - Rust stable with Cargo.
 - Tauri v2 system prerequisites for your OS.
 - For Windows playback: `src-tauri/lib/libmpv-wrapper.dll` and `src-tauri/lib/libmpv-2.dll`.
+- For Linux playback: install your distro's libmpv development/runtime package (for example `sudo apt install libmpv-dev`, `sudo dnf install mpv-libs-devel`, or `sudo pacman -S mpv`).
 
 ## Helper script
 
@@ -57,7 +58,7 @@ npm test
 
 1. Run `./scripts/betterplayer.sh doctor` and confirm Node, npm, Rust, and Cargo are detected.
 2. Run `./scripts/betterplayer.sh setup` to install/fetch dependencies.
-3. Add the required Windows libmpv DLLs under `src-tauri/lib/` if you want real mpv playback.
+3. Add the required platform libmpv runtime if you want real mpv playback: Windows uses DLLs under `src-tauri/lib/`; Linux uses the system libmpv package.
 4. Run `./scripts/betterplayer.sh dev`.
 5. In the app, click **Open File** and choose a local video or audio file.
 6. Try dragging a single media file into the window; it should open once.
