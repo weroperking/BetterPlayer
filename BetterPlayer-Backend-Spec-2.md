@@ -20,8 +20,8 @@ these**:
   embed lets the OS keep them in sync for free.
 - **Frontend:** React + TypeScript + Tailwind + Radix UI + Framer Motion +
   Zustand. Covered in the companion doc, `BetterPlayer-Frontend-Spec.md`.
-- **Dev platform:** Windows 10/11 first. macOS and Linux are a later porting
-  phase, not part of this build.
+- **Dev platforms:** Windows 10/11 and Linux for the MVP. macOS remains a later
+  porting phase.
 
 This document covers **only** backend/Rust/Tauri-host responsibilities. The
 **Frontend↔Backend Contract** section below is duplicated verbatim in the
@@ -49,7 +49,7 @@ expanding scope.
   package the frontend calls)
 - `tauri-plugin-dialog` (native "Open File" dialog)
 - `tauri-plugin-fs` (folder scanning, scoped to user-selected paths only)
-- Target: Windows 10/11, WebView2
+- Targets: Windows 10/11 with WebView2, and Linux with the Tauri v2 WebKitGTK runtime prerequisites
 
 ## Project layout
 
@@ -71,10 +71,14 @@ betterplayer/
 
 ## mpv embedding setup
 
-- Install via `npm run tauri add libmpv`, then follow the Windows setup:
-  download `libmpv-wrapper.dll` from the plugin's releases and the matching
-  `libmpv-2.dll` build, place both in `src-tauri/lib/`, and declare them as
-  bundled resources in `tauri.conf.json` (`bundle.resources`).
+- Install via `npm run tauri add libmpv`, then follow the platform setup:
+  - Windows: download `libmpv-wrapper.dll` from the plugin's releases and the
+    matching `libmpv-2.dll` build, place both in `src-tauri/lib/`, and declare
+    them as bundled resources in `tauri.conf.json` (`bundle.resources`).
+  - Linux: install the distro libmpv development/runtime package so the app links
+    against the system `libmpv.so` (`libmpv-dev` on Debian/Ubuntu,
+    `mpv-libs-devel` on Fedora, `mpv` on Arch). Do not commit distro shared
+    libraries into `src-tauri/lib/`.
 - The window must be created with `transparent: true` so the video surface
   shows through beneath the React overlay. The frontend's `html`/`body` must
   be transparent for this to work — coordinate with the frontend doc.
@@ -161,7 +165,7 @@ type MediaItem = {
 
 ## Acceptance criteria — Backend MVP is "done" when:
 
-- [ ] App launches on Windows 10/11 to a blank, responsive window
+- [ ] App launches on Windows 10/11 and Linux to a blank, responsive window
 - [ ] Open File dialog loads and plays a local video file (audio + video)
 - [ ] Open File dialog loads and plays a local audio-only file
 - [ ] Dropping a single file plays it exactly once (no duplicate-event bug)

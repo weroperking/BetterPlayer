@@ -27,6 +27,7 @@ Notes:
   - This script installs project packages, not OS-level toolchains.
   - Install Node.js 20+, npm, Rust stable, and the Tauri system prerequisites first.
   - On Windows MVP runs, place libmpv-wrapper.dll and libmpv-2.dll in src-tauri/lib/.
+  - On Linux MVP runs, install the system libmpv package (for example libmpv-dev or mpv-libs).
 USAGE
 }
 
@@ -79,10 +80,46 @@ install_rust_deps() {
   (cd "$TAURI_DIR" && cargo fetch)
 }
 
-warn_about_libmpv() {
-  if [ ! -f "$TAURI_DIR/lib/libmpv-wrapper.dll" ] || [ ! -f "$TAURI_DIR/lib/libmpv-2.dll" ]; then
-    warn "Windows libmpv DLLs are missing from src-tauri/lib/. The MVP UI/checks can run, but real mpv playback needs libmpv-wrapper.dll and libmpv-2.dll there."
+detect_os() {
+  case "${OSTYPE:-}" in
+    linux*) echo linux ;;
+    msys*|cygwin*|win32*) echo windows ;;
+    darwin*) echo macos ;;
+    *) uname -s 2>/dev/null | tr '[:upper:]' '[:lower:]' || echo unknown ;;
+  esac
+}
+
+linux_libmpv_status() {
+  if command -v pkg-config >/dev/null 2>&1 && pkg-config --exists mpv; then
+    printf 'present (%s)' "$(pkg-config --modversion mpv 2>/dev/null || echo pkg-config)"
+    return 0
   fi
+
+  if command -v ldconfig >/dev/null 2>&1 && ldconfig -p 2>/dev/null | grep -q 'libmpv\.so'; then
+    printf 'present (runtime library)'
+    return 0
+  fi
+
+  printf 'missing'
+  return 1
+}
+
+warn_about_libmpv() {
+  case "$(detect_os)" in
+    linux)
+      if ! linux_libmpv_status >/dev/null; then
+        warn "Linux libmpv is not discoverable. Install your distro's libmpv development/runtime package (for example: sudo apt install libmpv-dev, sudo dnf install mpv-libs-devel, or sudo pacman -S mpv)."
+      fi
+      ;;
+    windows|mingw*|msys*)
+      if [ ! -f "$TAURI_DIR/lib/libmpv-wrapper.dll" ] || [ ! -f "$TAURI_DIR/lib/libmpv-2.dll" ]; then
+        warn "Windows libmpv DLLs are missing from src-tauri/lib/. The MVP UI/checks can run, but real mpv playback needs libmpv-wrapper.dll and libmpv-2.dll there."
+      fi
+      ;;
+    *)
+      warn "libmpv runtime checks are currently documented for Windows and Linux only."
+      ;;
+  esac
 }
 
 setup() {
@@ -142,8 +179,19 @@ run_doctor() {
   printf '  rustc: %s\n' "$(command -v rustc >/dev/null 2>&1 && rustc --version || echo missing)"
   printf '  cargo: %s\n' "$(command -v cargo >/dev/null 2>&1 && cargo --version || echo missing)"
   printf '  node_modules: %s\n' "$([ -d "$NODE_MODULES_DIR" ] && echo present || echo missing)"
-  printf '  libmpv-wrapper.dll: %s\n' "$([ -f "$TAURI_DIR/lib/libmpv-wrapper.dll" ] && echo present || echo missing)"
-  printf '  libmpv-2.dll: %s\n' "$([ -f "$TAURI_DIR/lib/libmpv-2.dll" ] && echo present || echo missing)"
+  printf '  os: %s\n' "$(detect_os)"
+  case "$(detect_os)" in
+    linux)
+      printf '  libmpv: %s\n' "$(linux_libmpv_status)"
+      ;;
+    windows|mingw*|msys*)
+      printf '  libmpv-wrapper.dll: %s\n' "$([ -f "$TAURI_DIR/lib/libmpv-wrapper.dll" ] && echo present || echo missing)"
+      printf '  libmpv-2.dll: %s\n' "$([ -f "$TAURI_DIR/lib/libmpv-2.dll" ] && echo present || echo missing)"
+      ;;
+    *)
+      printf '  libmpv: unchecked for this OS\n'
+      ;;
+  esac
 }
 
 case "${1:-help}" in
