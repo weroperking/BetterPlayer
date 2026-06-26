@@ -1,0 +1,53 @@
+# Node dependencies
+node_modules/
+
+# Production
+dist/
+
+# Vite cache
+.vite/
+
+# Tauri build output
+src-tauri/target/
+target/
+**/target/
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Environment files
+.env
+.env.*
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE/editor settings
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Generated files
+package-lock.json
+pnpm-lock.yaml
+yarn.lock
+
+# Build artifacts
+dist/
+build/
+
+# Temporary files
+*.tmp
+*.temp
+
+# Misc
+*.log
