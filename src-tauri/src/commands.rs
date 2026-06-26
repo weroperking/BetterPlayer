@@ -13,19 +13,19 @@ impl Default for PlayerState {
     fn default() -> Self { Self { mpv: Mutex::new(MpvController::new()), queue: Mutex::new(Vec::new()), current_index: Mutex::new(-1) } }
 }
 
-#[derive(Serialize)]
+#[derive(Clone, Serialize)]
 #[serde(rename_all = "camelCase")]
 struct TimeSyncPayload { position_seconds: f64, is_playing: bool, synced_at: u128 }
 
-#[derive(Serialize)]
+#[derive(Clone, Serialize)]
 #[serde(rename_all = "camelCase")]
 struct VolumePayload { volume: f64, muted: bool }
 
-#[derive(Serialize)]
+#[derive(Clone, Serialize)]
 #[serde(rename_all = "camelCase")]
 struct QueuePayload { items: Vec<library::MediaItem>, current_index: isize }
 
-#[derive(Serialize)]
+#[derive(Clone, Serialize)]
 struct ErrorPayload { message: String, path: Option<String> }
 
 fn now_ms() -> u128 { SystemTime::now().duration_since(UNIX_EPOCH).map(|d| d.as_millis()).unwrap_or(0) }
