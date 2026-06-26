@@ -73,11 +73,16 @@ pub fn queue_previous(app: AppHandle, state: State<PlayerState>) -> Result<(), S
 
 fn move_queue(app: AppHandle, state: State<PlayerState>, delta: isize) -> Result<(), String> {
     let items = state.queue.lock().map_err(|_| "queue lock failed".to_string())?.clone();
-    let mut index = state.current_index.lock().map_err(|_| "queue index lock failed".to_string())?;
     if items.is_empty() { return Ok(()); }
-    let next = (*index + delta).clamp(0, items.len() as isize - 1);
-    if next == *index { return Ok(()); }
-    *index = next;
+
+    let next = {
+        let mut index = state.current_index.lock().map_err(|_| "queue index lock failed".to_string())?;
+        let next = (*index + delta).clamp(0, items.len() as isize - 1);
+        if next == *index { return Ok(()); }
+        *index = next;
+        next
+    };
+
     app.emit("player:queue-updated", QueuePayload { items: items.clone(), current_index: next }).map_err(|e| e.to_string())?;
     open_path(app, state, items[next as usize].path.clone())
 }

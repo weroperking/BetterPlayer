@@ -22,6 +22,8 @@
     "lucide-react": "latest"
   },
   "devDependencies": {
+    "@types/react": "latest",
+    "@types/react-dom": "latest",
     "@tauri-apps/cli": "latest"
   }
 }
