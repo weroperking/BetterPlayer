@@ -2,7 +2,12 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
-    "tauri": "tauri"
+    "tauri": "tauri",
+    "setup": "bash ./scripts/betterplayer.sh setup",
+    "start": "bash ./scripts/betterplayer.sh dev",
+    "check": "bash ./scripts/betterplayer.sh check",
+    "test": "bash ./scripts/betterplayer.sh test",
+    "doctor": "bash ./scripts/betterplayer.sh doctor"
   },
   "dependencies": {
     "@tauri-apps/api": "latest",
@@ -16,5 +21,7 @@
     "zustand": "latest",
     "lucide-react": "latest"
   },
-  "devDependencies": {}
+  "devDependencies": {
+    "@tauri-apps/cli": "latest"
+  }
 }
